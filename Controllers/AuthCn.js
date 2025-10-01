@@ -104,7 +104,15 @@ export const forgetPassword = catchAsync(async (req, res, next) => {
   if (!phoneNumber || !password || !code) return next(new HandleERROR(
     "Phone number, password and code are required"
   ))
+  const passReg = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/)
 
+  if(!passReg.test(password)){
+    return next(new HandleERROR("Error for regex",400))
+  }
+  const smsResult = verifyCode(phoneNumber,code)
+  if(!smsResult.success){
+    return next(new HandleERROR("Invalid code",401))
+  }
   const user = await User.findOne({ phoneNumber })
 
   user.password = bcryptjs.hashSync(password, 12)
