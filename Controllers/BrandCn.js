@@ -1,6 +1,8 @@
 import Brand from "../Models/BrandMd.js";
 import ApiFeatures, { catchAsync, HandleERROR } from "vanta-api";
 import Product from "../Models/ProductMd.js";
+import fs from "fs";
+import { __dirname } from "../app.js";
 
 export const createBrand = catchAsync(async (req, res, next) => {
   const brand = await Brand.create(req.body);
@@ -19,7 +21,7 @@ export const getAllBrand = catchAsync(async (req, res, next) => {
     .limitFields()
     .paginate()
     .populate();
-  const result = features.execute(); 
+  const result = features.execute();
   return res.status(200).json(result);
 });
 
@@ -53,10 +55,15 @@ export const removeBrand = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const products = await Product.find({ brandId: id });
   if (products.length > 0) {
-    return next(new HandleERROR("این برند به محصولی متصل است و قابل حذف نیست", 400));
+    return next(
+      new HandleERROR("این برند به محصولی متصل است و قابل حذف نیست", 400)
+    );
   }
 
-  await Brand.findByIdAndDelete(id);
+  const brand = await Brand.findByIdAndDelete(id);
+  if (brand.image) {
+    fs.unlinkSync(`${__dirname}/Public/Uploads/${brand.image}`);
+  }
   return res.status(200).json({
     success: true,
     data: null,
