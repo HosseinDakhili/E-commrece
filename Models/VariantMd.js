@@ -4,12 +4,15 @@ const variantSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      required: [true, ""],
-      enum: ["color", "size"],
+      required: [true, "نوع واریانت الزامی است"],
+      enum: {
+        values: ["color", "size"],
+        message: "نوع واریانت فقط می‌تواند 'color' یا 'size' باشد",
+      },
     },
     value: {
       type: String,
-      required: [true, ""],
+      required: [true, "مقدار واریانت الزامی است"],
     },
   },
   { timestamps: true }
