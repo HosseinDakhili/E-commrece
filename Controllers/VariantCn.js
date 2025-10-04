@@ -55,6 +55,7 @@ export const removeVariant = catchAsync(async (req, res, next) => {
       new HandleERROR("این واریانت به محصولی متصل است و قابل حذف نمی‌باشد", 400)
     );
   }
+  await Variant.findByIdAndDelete(id);
   return res.status(200).json({
     success: true,
     message: "واریانت با موفقیت حذف شد",
